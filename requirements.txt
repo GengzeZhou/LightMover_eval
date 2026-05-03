@@ -1,0 +1,15 @@
+numpy
+Pillow
+omegaconf
+tqdm
+scikit-image
+torch
+torchvision
+torchmetrics
+transformers
+huggingface_hub
+
+# Optional perceptual metrics. Uncomment what you actually use.
+# dreamsim
+# lpips
+# git+https://github.com/openai/CLIP.git

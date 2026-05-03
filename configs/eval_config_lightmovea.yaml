@@ -1,0 +1,13 @@
+# Lightmove-A variant. Use with:
+#   python src/evaluate_results.py \
+#       --config configs/eval_config_lightmovea.yaml \
+#       --results-dir results/<your_run>
+
+gt_dataset_path: "./data/Lightmove-A"
+metric_config_path: "./configs/metric_config.yaml"
+
+evaluation_modes:
+  - crop_average
+
+save_comparison: false
+comparison_output_dir: "./results/comparisons"

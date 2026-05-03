@@ -1,0 +1,30 @@
+# Metric configuration.
+# Supported metrics: dreamsim, psnr, lpips, dino, clip
+#
+# Comment out a metric to skip it (useful when running on CPU or without
+# specific dependencies installed).
+
+metrics:
+  # - name: dreamsim
+  #   pretrained: true
+  #   device: cuda
+  #   higher_is_better: false  # lower distance = better
+
+  - name: psnr
+    data_range: 255
+    higher_is_better: true
+
+  # - name: lpips
+  #   net_type: vgg
+  #   device: cuda
+  #   higher_is_better: false
+
+  - name: dino
+    model_name: facebook/dino-vits16
+    device: cuda
+    higher_is_better: true
+
+  - name: clip
+    model_name: ViT-B/32
+    device: cuda
+    higher_is_better: true

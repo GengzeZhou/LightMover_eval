@@ -1,0 +1,33 @@
+# Top-level evaluation configuration.
+#
+# Paths are resolved relative to the directory you launch the script from.
+# Default layout assumes you run commands from the toolkit root:
+#   evaluation_toolkit/
+#     ├── configs/
+#     ├── data/                 <- HF dataset goes here (see README)
+#     ├── results/              <- pre-generated <sample>_result.png files
+#     └── src/
+
+# Ground truth dataset path (one of ObjMove-A / ObjMove-B / Lightmove-A
+# subdirectories). Override per-run via --results-dir / a different config.
+gt_dataset_path: "./data/ObjMove-A"
+
+# Path to the metric configuration.
+metric_config_path: "./configs/metric_config.yaml"
+
+# Evaluation modes to run. Options:
+#   all          : compare full images
+#   target_crop  : compare only the target region (where the object lands)
+#   source_crop  : compare only the source region (where the object came from)
+#   crop_average : run target_crop and source_crop, then average the metrics
+evaluation_modes:
+  - crop_average
+  # - all
+  # - target_crop
+  # - source_crop
+
+# If true, save side-by-side GT/Pred PNGs alongside metrics.
+save_comparison: false
+
+# Where to save side-by-side comparison images when save_comparison is true.
+comparison_output_dir: "./results/comparisons"
