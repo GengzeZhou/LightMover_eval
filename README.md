@@ -164,6 +164,63 @@ HF_TOKEN=hf_xxx python download_data.py \
 > Treat the HF token as a secret — prefer `export HF_TOKEN=...` over passing it on
 > the command line.
 
+## Inference
+
+The toolkit does not perform model inference — it only scores predictions you
+generate. The sections below describe what each image in the benchmark means and
+what your model is expected to produce so its outputs can be scored against the
+ground truth.
+
+### Image roles
+
+For each sample (e.g. `data/Lightmove-A/lightmove_001/`):
+
+| File              | Role at inference time                                                                                          |
+| ----------------- | --------------------------------------------------------------------------------------------------------------- |
+| `src_input.jpg`   | **Input image** — the original, unedited photograph fed to the model.                                           |
+| `src_mask_hr.png` | **Object mask** — identifies where the object currently sits in `src_input.jpg`. Used to locate the source.     |
+| `tar_box_mask.png`| **Target mask** — specifies the output location where the model should place the object in the edited image.   |
+| `tar_input.jpg`   | **Ground truth** — reference edited image. The region inside `tar_box_mask.png` is the highlighted output area. |
+| `object.png`      | Pre-extracted object crop, provided as a convenience for models that condition on an isolated object reference. |
+
+In short: given the original image (`src_input.jpg`) plus the source location
+(`src_mask_hr.png`) and target location (`tar_box_mask.png`), your model should
+produce an edited image where the object has been moved to the target region,
+with lighting, shadows, and global illumination updated accordingly. The
+highlighted area inside `tar_box_mask.png` of the prediction should match
+`tar_input.jpg`.
+
+### Running your model
+
+Iterate over each sample directory, load the inputs above, run your model, and
+save the prediction as `<sample>_result.png` in a single flat output directory.
+A minimal driver looks like:
+
+```python
+from pathlib import Path
+from PIL import Image
+
+data_root = Path("data/Lightmove-A")
+out_dir   = Path("results/my_lightmove_run")
+out_dir.mkdir(parents=True, exist_ok=True)
+
+for sample_dir in sorted(p for p in data_root.iterdir() if p.is_dir()):
+    src_image   = Image.open(sample_dir / "src_input.jpg").convert("RGB")
+    object_mask = Image.open(sample_dir / "src_mask_hr.png").convert("L")
+    target_mask = Image.open(sample_dir / "tar_box_mask.png").convert("L")
+
+    pred = your_model.infer(
+        image=src_image,
+        object_mask=object_mask,   # where the object is now
+        target_mask=target_mask,   # where it should end up
+    )
+    pred.save(out_dir / f"{sample_dir.name}_result.png")
+```
+
+The same convention applies to the ObjectMover benchmark; only the sample prefix
+changes (`real_` instead of `lightmove_`). Once predictions are written, follow
+the [Evaluation](#evaluation) section to score them.
+
 ## Benchmark Results
 
 | Dataset       | mode           | PSNR ↑ | DINO ↑ | CLIP ↑ |
